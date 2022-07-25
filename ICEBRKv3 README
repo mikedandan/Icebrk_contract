@@ -1,0 +1,14 @@
+Latest major changes to ICEBRKv3 (FTM Mainnet):
+- Line 797, Removed smart contract requirement for banning bot addresses, since another proxy address would call contract function to skim our liquidity pool. This is a side effect of the reflection of tokens to the LP and the code vulnverability lies within the UniV2 router code (skim function to balance LP). This means we can now ban any address we find to be malicious.
+
+- Line 1060, optimized the swapAndLiquify function to remove unneccesary variable (sendAmount) and to perform address(this).balance.div(2). This saves gas and more efficiently executes the code in 2 lines rather than 3. Also reduced two swaps to a single swap which then pairs ALL remaining ICEBRK tokens for LP, then splits remainder in two. 
+
+- Line 1130, removed the "false" declaration of bool didRemove to save gas (all bool variables default to false, no need to declare)
+
+- Line 1135, added 3 if statements to optimize sending and remove the 0 token transfers to 0x0000 and to marketing. Only sends tokens IF the burnAmt and/or marketingAmt are greater than zero.
+
+- Line 1143, removed extra "if(didRemove)" statement and consolidated with the || (or) statement below which also calls restoreAllFee()
+
+- Line 1220, added SetMinTokensToSwapAndLiquify function to allow setMinTokens to trigger auto swap from the contract
+
+All changes were made with gas optimization as the first priority, followed by simplicity of code logic. 
